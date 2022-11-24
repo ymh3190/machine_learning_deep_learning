@@ -20,7 +20,9 @@ def main():
     # scikit_learn.regress()
     # question.answer_p64()
     # question.answer_p128()
-    scikit_learn.regress_linear()
+    # scikit_learn.regress_linear()
+    # scikit_learn.regress_linear_multiple()
+    scikit_learn.regress_logistic()
 
 
 if __name__ == '__main__':

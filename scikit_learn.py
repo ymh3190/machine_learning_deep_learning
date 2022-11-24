@@ -152,6 +152,86 @@ def classify() -> None:
     plt.show()
 
 
+def regress_logistic() -> None:
+    """이름은 회귀지만 분류 모델
+    - 선형 회귀와 동일하게 선형 방정식을 학습하지만 타겟을 분류(확률을 통해)하는데 사용
+    """
+    import pandas as pd
+    # 데이터프레임
+    fish = pd.read_csv('https://bit.ly/fish_csv_data')
+    # 처음 5개 행 출력
+    print(fish.head())
+    # 생선 종류 확인
+    print(pd.unique(fish['Species']))
+    # 입력 데이터 선택
+    fish_input = fish[['Weight', 'Length',
+                       'Diagonal', 'Height', 'Width']].to_numpy()
+    print(fish_input[:5])
+    fish_target = fish['Species'].to_numpy()
+    from sklearn.model_selection import train_test_split
+    train_input, test_input, train_target, test_target = train_test_split(
+        fish_input, fish_target, random_state=42)
+    from sklearn.preprocessing import StandardScaler
+    ss = StandardScaler()
+    ss.fit(train_input)
+    train_scaled = ss.transform(train_input)
+    test_scaled = ss.transform(test_input)
+    from sklearn.neighbors import KNeighborsClassifier
+    kn = KNeighborsClassifier(n_neighbors=3)
+    kn.fit(train_scaled, train_target)
+    print(kn.score(train_scaled, train_target))
+    print(kn.score(test_scaled, test_target))
+    # 타겟 데이터에 2개 이상의 클래스가 포함된 문제 -> 다중 분류(multi-class classification)
+    # 이진 분류와 모델을 만들고 훈련하는 방식은 동일
+    print(kn.classes_)
+    print(kn.predict(test_scaled[:5]))
+    proba = kn.predict_proba(test_scaled[:5])
+    import numpy as np
+    # print(np.round(proba, decimals=4))
+    distances, indexes = kn.kneighbors(test_scaled[3:4])
+    # 분류 근거가 부실한 단점(1/3과 2/3와 같은 기준)
+    # print(train_target[indexes])
+
+    import matplotlib.pyplot as plt
+    z = np.arange(-5, 5, 0.1)
+    # 시그모이드 함수(sigmoid function) 또는 로지스틱 함수(logistic function)
+    phi = 1/(1+(np.exp(-z)))
+    # plt.plot(z, phi)
+    # plt.xlabel('z')
+    # plt.ylabel('phi')
+    # plt.show()
+
+    char_arr = np.array(['A', 'B', 'C', 'D', 'E'])
+    # print(char_arr[[True, False, True, False, False]])
+
+    # 넘파이 배열 불리언 인덱싱
+    # true false로 값을 전달하여 행을 선택할 수 잇다
+    bream_smelt_indexes = (train_target == 'Bream') | (
+        train_target == 'Smelt')
+    train_bream_smelt = train_scaled[bream_smelt_indexes]
+    target_bream_smelt = train_target[bream_smelt_indexes]
+    # print(target_bream_smelt)
+
+    from sklearn.linear_model import LogisticRegression
+    lr = LogisticRegression()
+    lr.fit(train_bream_smelt, target_bream_smelt)
+    print('------------------------------')
+    print(lr.predict(train_bream_smelt[:5]))
+    # 첫 번째 열이 음성 클래스(0), 두 번째 열이 양성 클래스(1)
+    print(lr.predict_proba(train_bream_smelt[:5]))
+    print(lr.classes_)
+    # 로지스틱 회귀가 학습한 계수
+    print(lr.coef_, lr.intercept_)
+    decisions = lr.decision_function(train_bream_smelt[:5])
+    print(decisions)
+
+    # 시그모이드 함수 파이썬 사이파이 라이브러리
+    # scipy
+    # predict_proba() 메서드 출력의 두 번째의 값과 동일
+    from scipy.special import expit
+    print(expit(decisions))
+
+
 def regress() -> None:
     import matplotlib.pyplot as plt
     # plt.scatter(perch_length, perch_weight)
@@ -248,3 +328,136 @@ def regress_linear() -> None:
 
     print(lr.score(train_poly, train_target))
     print(lr.score(test_poly, test_target))
+
+
+def regress_linear_multiple() -> None:
+    """여러 개의 특성을 사용한 선형 회귀를 다중 회귀라 한다
+    - 하나의 특성을 사용한 선형 회귀 모델이 직선이라면 특성이 2개면 평면이 된다
+    - 농어의 길이 뿐만 아니라 농어의 높이까지 특성에 포함
+    """
+    import pandas as pd
+    # 인터넷에서 데이터를 바로 다운받아 사용
+    # csv는 콤마로 나누어져 있는 텍스트 파일
+    df = pd.read_csv('https://bit.ly/perch_csv_data')
+    perch_full = df.to_numpy()
+    # print(perch_full)
+    # feature.py에 perch_weight가 정의됐으므로 생략
+    # import numpy as np
+    # perch_weight = np.array([5.9, 32.0, 40.0, 51.5, 70.0, 100.0, 78.0, 80.0, 85.0, 85.0, 110.0,
+    #                      115.0, 125.0, 130.0, 120.0, 120.0, 130.0, 135.0, 110.0, 130.0,
+    #                      150.0, 145.0, 150.0, 170.0, 225.0, 145.0, 188.0, 180.0, 197.0,
+    #                      218.0, 300.0, 260.0, 265.0, 250.0, 250.0, 300.0, 320.0, 514.0,
+    #                      556.0, 840.0, 685.0, 700.0, 700.0, 690.0, 900.0, 650.0, 820.0,
+    #                      850.0, 900.0, 1015.0, 820.0, 1100.0, 1000.0, 1100.0, 1000.0,
+    #                      1000.0])
+    from sklearn.model_selection import train_test_split
+    train_input, test_input, train_target, test_target = train_test_split(
+        perch_full, perch_weight, random_state=42)
+    # 특성을 만들거나 전처리하기
+    from sklearn.preprocessing import PolynomialFeatures
+    poly = PolynomialFeatures()
+    # target이 필요없다
+    poly.fit([[2, 3]])
+    # fit을 해야 transform이 가능
+    # 2개의 특성을 가진 샘플 [2, 3]이 6개의 특성을 가진 샘플 [1, 2, 3, 4, 6, 9]로 변환
+    # 1이 추가되는 이유는 절편X1 때문
+    # include_bias=False로 해결
+    # print(poly.transform([[2, 3]]))
+    poly = PolynomialFeatures(include_bias=False)
+    poly.fit([[2, 3]])
+    # print(poly.transform([[2, 3]]))
+    poly = PolynomialFeatures(include_bias=False)
+    poly.fit(train_input)
+    train_poly = poly.transform(train_input)
+    # print(train_poly.shape)
+    # 특성이 어떻게 만들어졌는지 확인하는 방법 제공
+    # 'x0' 'x1' 'x2' 'x0^2' 'x0 x1' 'x0 x2' 'x1^2' 'x1 x2' 'x2^2'
+    # print(poly.get_feature_names_out())
+    # 항상 훈련 세트를 기준으로 테스트 세트를 변환(fit)
+    test_poly = poly.transform(test_input)
+    # print(test_poly)
+
+    from sklearn.linear_model import LinearRegression
+    lr = LinearRegression()
+    lr.fit(train_poly, train_target)
+    # print(lr.score(train_poly, train_target))
+    # print(lr.score(test_poly, test_target))
+    # 5제곱까지 특성을 만들어 추가
+    poly = PolynomialFeatures(degree=5, include_bias=False)
+    poly.fit(train_input)
+    train_poly = poly.transform(train_input)
+    test_poly = poly.transform(test_input)
+    # print(train_poly.shape)
+
+    lr.fit(train_poly, train_target)
+    # print(lr.score(train_poly, train_target))
+    # 테스트 점수는 음수..
+    # 특성을 많게 한다고 능사가 아니다
+    # print(lr.score(test_poly, test_target))
+
+    # regularization(규제) : 머신 러닝 모델이 훈련 세트를 너무 과도하게 학습하지 못하도록 훼방하는 것
+    # 선형 회귀 모델의 경우 특성에 곱해지는 계수(가중치)의 크기를 작게 만드는 일
+    # 모델이 훈련 세트에 과대적합되지 않도록 하는 것
+    # 특성 스케일
+    from sklearn.preprocessing import StandardScaler
+    ss = StandardScaler()
+    ss.fit(train_poly)
+    train_scaled = ss.transform(train_poly)
+    test_scaled = ss.transform(test_poly)
+
+    # ridge(릿지 회귀)
+    from sklearn.linear_model import Ridge
+    ridge = Ridge()
+    ridge.fit(train_scaled, train_target)
+    # print(ridge.score(train_scaled, train_target))
+    # print(ridge.score(test_scaled, test_target))
+
+    # 모델이 학습할 수 없고 사람이 알려줘야 하는 파라미터를 하이퍼파라미터라 한다
+    # alpha가 크면 규제 강도가 쎄짐
+    # 적절한 alpha값 찾기
+    import matplotlib.pyplot as plt
+    train_score = []
+    test_score = []
+    alpha_list = [0.001, 0.01, 0.1, 1, 10, 100]
+    for alpha in alpha_list:
+        ridge = Ridge(alpha=alpha)
+        ridge.fit(train_scaled, train_target)
+        train_score.append(ridge.score(train_scaled, train_target))
+        test_score.append(ridge.score(test_scaled, test_target))
+
+    # plt.plot(np.log10(alpha_list), train_score)
+    # plt.plot(np.log10(alpha_list), test_score)
+    plt.xlabel('alpha')
+    plt.ylabel('R^2')
+    # plt.show()
+    ridge = Ridge(alpha=0.1)
+    ridge.fit(train_scaled, train_target)
+    # print(ridge.score(train_scaled, train_target))
+    # print(ridge.score(test_scaled, test_target))
+
+    # lasso(라쏘 회귀)
+    # 훈련 세트 억제
+    # 가중치를 0으로 만들 수 있음
+    from sklearn.linear_model import Lasso
+    lasso = Lasso()
+    lasso.fit(train_scaled, train_target)
+    # print(lasso.score(train_scaled, train_target))
+    train_score = []
+    test_score = []
+    alpha_list = [0.001, 0.01, 0.1, 1, 10, 100]
+    # for alpha in alpha_list:
+    #     lasso = Lasso(alpha=alpha, max_iter=100000000)
+    #     lasso.fit(train_scaled, train_target)
+    #     train_score.append(lasso.score(train_scaled, train_target))
+    #     test_score.append(lasso.score(test_scaled, test_target))
+
+    plt.plot(np.log10(alpha_list), train_score)
+    plt.plot(np.log10(alpha_list), test_score)
+    # plt.show()
+    lasso = Lasso(alpha=10)
+    lasso.fit(train_scaled, train_target)
+    print(lasso.score(train_scaled, train_target))
+    print(lasso.score(test_scaled, test_target))
+
+    # 0이 된 가중치
+    print(np.sum(lasso.coef_ == 0))
