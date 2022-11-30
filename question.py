@@ -1,6 +1,15 @@
 from feature import *
 
 
+def answer(arg) -> None:
+    if arg == 0:
+        answer_p64()
+    elif arg == 1:
+        answer_p128()
+    elif arg == 2:
+        answer_p241()
+
+
 def answer_p64() -> None:
     """정확도가 1이하로 내려갈 때의 값 찾기
     """
@@ -42,3 +51,25 @@ def answer_p128() -> None:
         plt.xlabel('length')
         plt.ylabel('weight')
         plt.show()
+
+
+def answer_p241() -> None:
+    """결정트리
+    """
+    from sklearn.tree import DecisionTreeClassifier, plot_tree
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    wine = pd.read_csv('https://bit.ly/wine_csv_data')
+    data = wine[['alcohol', 'sugar',  'pH']].to_numpy()
+    target = wine['class'].to_numpy()
+    train_input, test_input, train_target, test_target = train_test_split(
+        data, target)
+    dt = DecisionTreeClassifier(
+        max_depth=3, min_impurity_decrease=0.0005, random_state=42)
+    dt.fit(train_input, train_target)
+    print(dt.score(train_input, train_target))
+    print(dt.score(test_input, test_target))
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(20, 15))
+    plot_tree(dt, filled=True, feature_names=['alcohol', 'sugar',  'pH'])
+    plt.show()
