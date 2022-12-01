@@ -405,6 +405,31 @@ class Classification():
         dt = gs.best_estimator_
         # print(dt.score(train_input, train_target))
         """ 그리드 서치로 찾은 최적의 매개변수 """
-        print(gs.best_params_)
+        # print(gs.best_params_)
         """ 각 매개변수에서 수행한 교차 점증의 평균 점수 """
-        print(gs.cv_results_['mean_test_score'])
+        # print(gs.cv_results_['mean_test_score'])
+        params = {'min_impurity_decrease': np.arange(0.0001, 0.001, 0.0001), 'max_depth': range(
+            5, 20, 1), 'min_samples_split': range(2, 100, 10)}
+        gs = GridSearchCV(DecisionTreeClassifier(
+            random_state=42), params, n_jobs=-1)
+        gs.fit(train_input, train_target)
+        # print(gs.best_params_)
+        """최상의 교차 검증 점수 """
+        # print(np.max(gs.cv_results_['mean_test_score']))
+        """랜덤 서치: 매개변수 값의 목록을 전달하는게 아니라  매개변수를 샘플링할 수 있는 확률 분포 객체를 전달"""
+        from scipy.stats import uniform, randint
+        rgen = randint(0, 10)
+        # print(rgen.rvs(10))
+        # print(np.unique(rgen.rvs(1000), return_counts=True))
+        ugen = uniform(0, 1)
+        # print(ugen.rvs(10))
+        params = {'min_impurity_decrease': uniform(0.0001, 0.001), 'max_depth': range(
+            20, 50), 'min_samples_split': randint(2, 25), 'min_samples_leaf': randint(1, 25)}
+        from sklearn.model_selection import RandomizedSearchCV
+        gs = RandomizedSearchCV(DecisionTreeClassifier(
+            random_state=42), params, n_iter=100, n_jobs=-1, random_state=42)
+        gs.fit(train_input, train_target)
+        # print(gs.best_params_)
+        # print(np.max(gs.cv_results_['mean_test_score']))
+        dt = gs.best_estimator_
+        print(dt.score(test_input, test_target))
