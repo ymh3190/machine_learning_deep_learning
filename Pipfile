@@ -8,6 +8,9 @@ numpy = "*"
 pandas = "*"
 scikit-learn = "*"
 matplotlib = "*"
+xgboost = "*"
+lightgbm = "*"
+wget = "*"
 
 [dev-packages]
 

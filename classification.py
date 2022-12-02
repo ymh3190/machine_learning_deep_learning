@@ -5,7 +5,7 @@ class Classification():
     def classify() -> None:
         """첫 번째 머신 러닝 프로그램 : k-최근접 이웃(k-Nearest Neighbors) 알고리즘
         - 어떤 데이터에 대한 답을 구할 때 주위의 다른 데이터를 보고 다수를 차지하는 것을 정답으로 합니다.
-        - 단점 : 새로운 데이터에 대해 예측할 때는 가장 가까운 직선거리에 어떤 데이터가 있는지를 살핀다 \
+        - 단점 : 새로운 데이터에 대해 예측할 때는 가장 가까운 직선거리에 어떤 데이터가 있는지를 살핀다
             이러한 특징으로 데이터가 아주 많은 경우 사용하기 어려움
         - 사례 기반 학습
         """
@@ -432,4 +432,98 @@ class Classification():
         # print(gs.best_params_)
         # print(np.max(gs.cv_results_['mean_test_score']))
         dt = gs.best_estimator_
-        print(dt.score(test_input, test_target))
+        # print(dt.score(test_input, test_target))``
+
+    def classify_tree_ensemble() -> None:
+        """정형 데이터(structured data)에 가장 뛰어난 성과를 내는 알고리즘"""
+        import numpy as np
+        import pandas as pd
+        from sklearn.model_selection import train_test_split
+        wine = pd.read_csv('https://bit.ly/wine_csv_data')
+        data = wine[['alcohol', 'sugar', 'pH']].to_numpy()
+        target = wine['class'].to_numpy()
+        train_input, test_input, train_target, test_target = train_test_split(
+            data, target, test_size=0.2, random_state=42)
+        from sklearn.model_selection import cross_validate
+        from sklearn.ensemble import RandomForestClassifier
+        rf = RandomForestClassifier(n_jobs=-1, random_state=42)
+        scores = cross_validate(
+            rf, train_input, train_target, return_train_score=True, n_jobs=-1)
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        # rf.fit(train_input, train_target)
+        # print(rf.feature_importances_)
+        rf = RandomForestClassifier(oob_score=True, n_jobs=-1, random_state=42)
+        rf.fit(train_input, train_target)
+        # print(rf.oob_score_)
+        """ 엑스트라 앙상블 """
+        from sklearn.ensemble import ExtraTreesClassifier
+        et = ExtraTreesClassifier(n_jobs=-1, random_state=42)
+        scores = cross_validate(
+            et, train_input, train_target, return_train_score=True, n_jobs=-1)
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        et.fit(train_input, train_target)
+        # print(et.feature_importances_)
+        # print(et.feature_importances_)
+
+    def classify_gradient_boosting() -> None:
+        """그레디언트 부스팅 : 경사 하강법을 사용하여 트리의 앙상블에 추가"""
+        from sklearn.ensemble import GradientBoostingClassifier
+        gb = GradientBoostingClassifier(random_state=42)
+        from sklearn.model_selection import cross_validate
+        import pandas as pd
+        wine = pd.read_csv('https://bit.ly/wine_csv_data')
+        data = wine[['alcohol', 'sugar', 'pH']].to_numpy()
+        target = wine['class'].to_numpy()
+        from sklearn.model_selection import train_test_split
+        train_input, test_input, train_target, test_target = train_test_split(
+            data, target, test_size=0.2, random_state=42)
+        scores = cross_validate(
+            gb, train_input, train_target, return_train_score=True, n_jobs=-1)
+        import numpy as np
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        gb = GradientBoostingClassifier(
+            n_estimators=500, learning_rate=0.2, random_state=42)
+        scores = cross_validate(
+            gb, train_input, train_target, return_train_score=True, n_jobs=-1)
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        gb.fit(train_input, train_target)
+        # print(gb.feature_importances_)
+
+    def classify_histogram_based_gradient_boosting() -> None:
+        """히스토그램 기반 그레디언트 부스팅 : 입력 특성을 256개 구간으로 나눔"""
+        from sklearn.ensemble import HistGradientBoostingClassifier
+        hgb = HistGradientBoostingClassifier(random_state=42)
+        from sklearn.model_selection import cross_validate, train_test_split
+        import pandas as pd
+        import numpy as np
+        wine = pd.read_csv('https://bit.ly/wine_csv_data')
+        data = wine[['alcohol', 'sugar', 'pH']].to_numpy()
+        target = wine['class'].to_numpy()
+        train_input, test_input, train_target, test_target = train_test_split(
+            data, target, test_size=0.2, random_state=42)
+        scores = cross_validate(
+            hgb, train_input, train_target, return_train_score=True)
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+        from sklearn.inspection import permutation_importance
+        hgb.fit(train_input, train_target)
+        result = permutation_importance(
+            hgb, train_input, train_target, n_repeats=10, random_state=42, n_jobs=-1)
+        # print(result.importances_mean)
+        result = permutation_importance(
+            hgb, test_input, test_target, n_repeats=10, random_state=42, n_jobs=-1)
+        # print(result.importances_mean)
+        # print(hgb.score(test_input, test_target))
+
+        """ XGBoost Library """
+        from xgboost import XGBClassifier
+        xgb = XGBClassifier(tree_method='hist', random_state=42)
+        scores = cross_validate(
+            xgb, train_input, train_target, return_train_score=True)
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+
+        """ LightGBM Library by Microsoft  """
+        from lightgbm import LGBMClassifier
+        lgb = LGBMClassifier(random_state=42)
+        scores = cross_validate(
+            lgb, train_input, train_target, return_train_score=True, n_jobs=-1)
+        # print(np.mean(scores['train_score']), np.mean(scores['test_score']))
