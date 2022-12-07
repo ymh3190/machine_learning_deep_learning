@@ -17,4 +17,5 @@ def algorithm() -> None:
     # Classification.classify_histogram_based_gradient_boosting()
 
     # UnsupervisedLearning.cluster()
-    UnsupervisedLearning.cluster_center()
+    # UnsupervisedLearning.cluster_center()
+    UnsupervisedLearning.dimension_reduction()

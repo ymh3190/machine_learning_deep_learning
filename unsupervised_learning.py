@@ -102,5 +102,27 @@ class UnsupervisedLearning():
         # draw_fruits(km.cluster_centers_.reshape(-1, 100, 100), ratio=3)
         print(km.transform(fruits_2d[100:101]))
         print(km.predict(fruits_2d[100:101]))
-        draw_fruits(fruits[100:101])
+        # draw_fruits(fruits[100:101])
         print(km.n_iter_)
+
+        # 최적의 k 찾기
+        inertia = []
+        for k in range(2, 7):
+            km = KMeans(n_clusters=k, random_state=42)
+            km.fit(fruits_2d)
+            inertia.append(km.inertia_)
+
+        import matplotlib.pyplot as plt
+        plt.plot(range(2, 7), inertia)
+        plt.xlabel('k')
+        plt.ylabel('inertia')
+        plt.show()
+
+    def dimension_reduction() -> None:
+        """차원축소 : 3차원을 2차원으로 줄이는게 아니라
+        1차원 배열에서 열의 개수를 줄이는 것을 의미한다
+        데이터를 가장 잘 나타내는 일부 특성을 선택하여
+        데이터 크기를 줄이고 지도 학습 모델의 성능을 향상시키는 방법
+        PCA(principal component analysis) : 주성분 분석
+        """
+        pass
