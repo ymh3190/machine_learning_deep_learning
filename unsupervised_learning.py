@@ -80,22 +80,6 @@ class UnsupervisedLearning():
         # print(km.labels_)
         # print(np.unique(km.labels_, return_counts=True))
 
-        def draw_fruits(arr, ratio=1):
-            import matplotlib.pyplot as plt
-            import numpy as np
-            n = len(arr)
-            rows = int(np.ceil(n/10))
-            cols = n if rows < 2 else 10
-            fig, axs = plt.subplots(rows, cols, figsize=(
-                cols*ratio, rows*ratio), squeeze=False)
-            for i in range(rows):
-                for j in range(cols):
-                    if i*10 + j < n:
-                        axs[i, j].imshow(arr[i*10+j], cmap='gray_r')
-                    axs[i, j].axis('off')
-
-            plt.show()
-
         # draw_fruits(fruits[km.labels_ == 2])
         # draw_fruits(fruits[km.labels_ == 1])
         # draw_fruits(fruits[km.labels_ == 0])
@@ -125,4 +109,45 @@ class UnsupervisedLearning():
         데이터 크기를 줄이고 지도 학습 모델의 성능을 향상시키는 방법
         PCA(principal component analysis) : 주성분 분석
         """
-        pass
+        import os
+        FRUITS_300_npy = 'fruits_300.npy'
+        if FRUITS_300_npy in os.listdir(os.getcwd()):
+            pass
+        else:
+            import wget
+            wget.download('https://bit.ly/fruits_300_data', out=FRUITS_300_npy)
+        import numpy as np
+        fruits = np.load(FRUITS_300_npy)
+        fruits_2d = fruits.reshape(-1, 100*100)
+        from sklearn.decomposition import PCA
+        pca = PCA(n_components=50)
+        pca.fit(fruits_2d)
+        # print(pca.components_.shape)
+        # draw_fruits(pca.components_.reshape(-1, 100, 100))
+        # print(fruits_2d.shape)
+        fruits_pca = pca.transform(fruits_2d)
+        # print(fruits_pca.shape)
+
+        fruits_inverse = pca.inverse_transform(fruits_pca)
+        # print(fruits_inverse.shape)
+
+        fruits_reconstruct = fruits_inverse.reshape(-1, 100, 100)
+        for start in [0, 100, 200]:
+            draw_fruits(fruits_reconstruct[start:start+100])
+
+
+def draw_fruits(arr, ratio=1):
+    import matplotlib.pyplot as plt
+    import numpy as np
+    n = len(arr)
+    rows = int(np.ceil(n/10))
+    cols = n if rows < 2 else 10
+    fig, axs = plt.subplots(rows, cols, figsize=(
+        cols*ratio, rows*ratio), squeeze=False)
+    for i in range(rows):
+        for j in range(cols):
+            if i*10 + j < n:
+                axs[i, j].imshow(arr[i*10+j], cmap='gray_r')
+            axs[i, j].axis('off')
+
+    plt.show()
