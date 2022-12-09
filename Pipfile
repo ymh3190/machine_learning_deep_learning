@@ -11,6 +11,7 @@ matplotlib = "*"
 xgboost = "*"
 lightgbm = "*"
 wget = "*"
+tensorflow = "*"
 
 [dev-packages]
 
