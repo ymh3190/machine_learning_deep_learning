@@ -24,12 +24,13 @@ def cluster() -> None:
     Cluster.dimension_reduction()
 
 
+def artificial_neural_network() -> None:
+    from artificial_neural_network import ArtificialNeuralNetwork
+    ArtificialNeuralNetwork.artificial_neural_network()
+
+
 def algorithm() -> None:
     # classify()
     # regress()
     # cluster()
-    tmp()
-
-
-def tmp() -> None:
-    pass
+    artificial_neural_network()
