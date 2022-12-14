@@ -25,8 +25,9 @@ def cluster() -> None:
 
 
 def artificial_neural_network() -> None:
-    from artificial_neural_network import ArtificialNeuralNetwork
-    ArtificialNeuralNetwork.artificial_neural_network()
+    from ann import ArtificialNeuralNetwork
+    # ArtificialNeuralNetwork.artificial_neural_network()
+    ArtificialNeuralNetwork.deep_neural_network()
 
 
 def algorithm() -> None:
