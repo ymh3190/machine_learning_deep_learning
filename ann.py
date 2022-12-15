@@ -70,19 +70,65 @@ class ArtificialNeuralNetwork():
         #               metrics='accuracy')
         # model.fit(train_scaled, train_target, epochs=5)
 
-        """Flatten class"""
+        (train_input, train_target), (
+            test_input, test_target) = keras.datasets.fashion_mnist.load_data()
+        train_scaled = train_input/255.0
+        train_scaled, val_scaled, train_target, val_target = train_test_split(
+            train_scaled, train_target, test_size=0.2, random_state=42)
+
+        def flatten() -> None:
+            """Flatten class"""
+            model = keras.Sequential()
+            model.add(keras.layers.Flatten(input_shape=(28, 28)))
+            """렐루 함수"""
+            model.add(keras.layers.Dense(100, activation='relu'))
+            model.add(keras.layers.Dense(10, activation='softmax'))
+            # model.summary()
+            from sklearn.model_selection import train_test_split
+            model.compile(loss='sparse_categorical_crossentropy',
+                          metrics='accuracy')
+            model.fit(train_scaled, train_target, epochs=5)
+            model.evaluate(val_scaled, val_target)
+
+        """optimizer: keras에서 제공하는 다양한 종류의 경사 하강법(RMSprop)
+        하이퍼파라미터: 은닉층 뉴런 개수, 활성화 함수 종류(sigmoid, softmax, relu), 층의 종류(밀집층, 합성곱 층 등), epochs, RMSprop의 학습률"""
+        def optimizer() -> None:
+            model.compile(
+                optimizer='sgd', loss='sparse_categorical_crossentropy', metrics='accuracy')
+            # sgd = keras.optimizers.SGD()
+            # model.compile(
+            #     optimizer=sgd, loss='sparse_categorical_crossentropy', metrics='accuracy')
+            sgd = keras.optimizers.SGD(learning_rate=0.1)
+
         model = keras.Sequential()
         model.add(keras.layers.Flatten(input_shape=(28, 28)))
         model.add(keras.layers.Dense(100, activation='relu'))
         model.add(keras.layers.Dense(10, activation='softmax'))
-        # model.summary()
+        model.compile(
+            optimizer='adam', loss='sparse_categorical_crossentropy', metrics='accuracy')
+        model.fit(train_scaled, train_target, epochs=5)
+        model.evaluate(val_scaled, val_target)
+
+    def train_neural_network() -> None:
+        from tensorflow import keras
+        from sklearn.model_selection import train_test_split
         (train_input, train_target), (
             test_input, test_target) = keras.datasets.fashion_mnist.load_data()
-        from sklearn.model_selection import train_test_split
         train_scaled = train_input/255.0
         train_scaled, val_scaled, train_target, val_target = train_test_split(
             train_scaled, train_target, test_size=0.2, random_state=42)
+
+        def model_fn(a_layer=None) -> None:
+            model = keras.Sequential()
+            model.add(keras.layers.Flatten(input_shape=(28, 28)))
+            model.add(keras.layers.Dense(100, activation='relu'))
+            if a_layer:
+                model.add(a_layer)
+            model.add(keras.layers.Dense(10, activation='softmax'))
+            return model
+        model = model_fn()
+        model.summary()
         model.compile(loss='sparse_categorical_crossentropy',
                       metrics='accuracy')
-        model.fit(train_scaled, train_target, epochs=5)
-        model.evaluate(val_scaled, val_target)
+        history = model.fit(train_scaled, train_target, epochs=5, verbose=0)
+        print(history.history.keys())
