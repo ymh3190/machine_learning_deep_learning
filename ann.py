@@ -126,9 +126,54 @@ class ArtificialNeuralNetwork():
                 model.add(a_layer)
             model.add(keras.layers.Dense(10, activation='softmax'))
             return model
-        model = model_fn()
-        model.summary()
-        model.compile(loss='sparse_categorical_crossentropy',
-                      metrics='accuracy')
-        history = model.fit(train_scaled, train_target, epochs=5, verbose=0)
-        print(history.history.keys())
+
+        def rmsprop_optimizer() -> None:
+            model = model_fn()
+            model.summary()
+            model.compile(loss='sparse_categorical_crossentropy',
+                          metrics='accuracy')
+            # history = model.fit(train_scaled, train_target, epochs=5, verbose=0)
+            # history = model.fit(train_scaled, train_target, epochs=20, verbose=0)
+            history = model.fit(train_scaled, train_target, epochs=20,
+                                verbose=0, validation_data=(val_scaled, val_target))
+            print(history.history.keys())
+
+            import matplotlib.pyplot as plt
+            plt.plot(history.history['loss'])
+            # plt.plot(history.history['accuracy'])
+            plt.plot(history.history['val_loss'])
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.legend(['train', 'val'])
+            plt.show()
+
+        def adam_optimizer() -> None:
+            model = model_fn()
+            model.compile(
+                optimizer='adam', loss='sparse_categorical_crossentropy', metrics='accuracy')
+            history = model.fit(train_scaled, train_target, epochs=20,
+                                verbose=0, validation_data=(val_scaled, val_target))
+            import matplotlib.pyplot as plt
+            plt.plot(history.history['loss'])
+            plt.plot(history.history['val_loss'])
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.legend(['train', 'val'])
+            plt.show()
+
+        def drop_out() -> None:
+            model = model_fn(keras.layers.Dropout(0.3))
+            model.summary()
+            model.compile(
+                optimizer='adam', loss='sparse_categorical_crossentropy', metrics='accuracy')
+            history = model.fit(train_scaled, train_target, epochs=20,
+                                verbose=0, validation_data=(val_scaled, val_target))
+            import matplotlib.pyplot as plt
+            plt.plot(history.history['loss'])
+            plt.plot(history.history['val_loss'])
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.legend(['train', 'val'])
+            plt.show()
+
+        drop_out()
