@@ -163,11 +163,56 @@ class ArtificialNeuralNetwork():
 
         def drop_out() -> None:
             model = model_fn(keras.layers.Dropout(0.3))
-            model.summary()
-            model.compile(
-                optimizer='adam', loss='sparse_categorical_crossentropy', metrics='accuracy')
-            history = model.fit(train_scaled, train_target, epochs=20,
-                                verbose=0, validation_data=(val_scaled, val_target))
+            # model.summary()
+            model.compile(optimizer='adam',
+                          loss='sparse_categorical_crossentropy',
+                          metrics='accuracy')
+            history = model.fit(train_scaled, train_target,
+                                epochs=20, verbose=0,
+                                validation_data=(val_scaled, val_target))
+            import matplotlib.pyplot as plt
+            plt.plot(history.history['loss'])
+            plt.plot(history.history['val_loss'])
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.legend(['train', 'val'])
+            # plt.show()
+            MODEL_WEIGHTS_H5 = 'model-weights.h5'
+            MODEL_WHOLE_H5 = 'model-whole.h5'
+            import os
+            if not MODEL_WEIGHTS_H5 in os.listdir(os.getcwd()):
+                model.save_weights(MODEL_WEIGHTS_H5)
+            elif not MODEL_WHOLE_H5 in os.listdir(os.getcwd()):
+                model.save(MODEL_WHOLE_H5)
+            model = model_fn(keras.layers.Dropout(0.3))
+            model.load_weights(MODEL_WEIGHTS_H5)
+            import numpy as np
+            val_labels = np.argmax(model.predict(val_scaled), axis=-1)
+            print(np.mean(val_labels == val_target))
+            model = keras.models.load_model(MODEL_WHOLE_H5)
+            model.evaluate(val_scaled, val_target)
+
+        def call_back() -> None:
+            model = model_fn(keras.layers.Dropout(0.3))
+            model.compile(optimizer='adam',
+                          loss='sparse_categorical_crossentropy',
+                          metrics='accuracy')
+            BEST_MODEL_H5 = 'best-model.h5'
+            checkpoint_cb = keras.callbacks.ModelCheckpoint(
+                BEST_MODEL_H5, save_best_only=True)
+            earlypoint_cb = keras.callbacks.EarlyStopping(
+                patience=2, restore_best_weights=True)
+            history = model.fit(train_scaled, train_target,
+                                epochs=20, verbose=0,
+                                validation_data=(val_scaled, val_target),
+                                callbacks=[checkpoint_cb, earlypoint_cb])
+            # model.fit(train_scaled, train_target, epochs=20,
+            #           verbose=0, validation_data=(val_scaled, val_target),
+            #           callbacks=[checkpoint_cb])
+            # model = keras.models.load_model(BEST_MODEL_H5)
+            # model.evaluate(val_scaled, val_target)
+            print(earlypoint_cb.stopped_epoch)
+            print(model.evaluate(val_scaled, val_target))
             import matplotlib.pyplot as plt
             plt.plot(history.history['loss'])
             plt.plot(history.history['val_loss'])
@@ -176,4 +221,4 @@ class ArtificialNeuralNetwork():
             plt.legend(['train', 'val'])
             plt.show()
 
-        drop_out()
+        call_back()
