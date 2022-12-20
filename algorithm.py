@@ -31,8 +31,14 @@ def artificial_neural_network() -> None:
     ArtificialNeuralNetwork.train_neural_network()
 
 
+def convolutional_neural_network() -> None:
+    from cnn import ConvolutionalNeuralNetwork
+    ConvolutionalNeuralNetwork.convolutional_neural_network()
+
+
 def algorithm() -> None:
     # classify()
     # regress()
     # cluster()
-    artificial_neural_network()
+    # artificial_neural_network()
+    convolutional_neural_network()
