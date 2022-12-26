@@ -25,15 +25,17 @@ def cluster() -> None:
 
 
 def artificial_neural_network() -> None:
-    from ann import ArtificialNeuralNetwork
-    # ArtificialNeuralNetwork.artificial_neural_network()
-    # ArtificialNeuralNetwork.deep_neural_network()
-    ArtificialNeuralNetwork.train_neural_network()
+    from ann import ArtificialNeuralNetwork as ann
+    ann.artificial_neural_network()
+    ann.deep_neural_network()
+    ann.train_neural_network()
 
 
 def convolutional_neural_network() -> None:
-    from cnn import ConvolutionalNeuralNetwork
-    ConvolutionalNeuralNetwork.convolutional_neural_network()
+    from cnn import ConvolutionalNeuralNetwork as cnn
+    # cnn.convolutional_neural_network()
+    # cnn.convolutional_neural_network_classification()
+    cnn.convolutional_neural_network_virtualization()
 
 
 def algorithm() -> None:

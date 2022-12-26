@@ -1,11 +1,14 @@
 class ConvolutionalNeuralNetwork():
     def convolutional_neural_network() -> None:
         from tensorflow import keras
-        # keras.layers.Conv2D(10, kernel_size=(3, 3), activation='relu')
-        # keras.layers.Conv2D(10, kernel_size=(
-        #     3, 3), activation='relu', padding='same')
-        # keras.layers.MaxPooling2D(2)
-        # keras.layers.MaxPooling2D(2, strides=2, padding='valid')
+        keras.layers.Conv2D(10, kernel_size=(3, 3), activation='relu')
+        keras.layers.Conv2D(10, kernel_size=(
+            3, 3), activation='relu', padding='same')
+        keras.layers.MaxPooling2D(2)
+        keras.layers.MaxPooling2D(2, strides=2, padding='valid')
+
+    def convolutional_neural_network_classification() -> None:
+        from tensorflow import keras
         from sklearn.model_selection import train_test_split
         (train_input, train_target), (
             test_input, test_target) = keras.datasets.fashion_mnist.load_data()
@@ -24,9 +27,9 @@ class ConvolutionalNeuralNetwork():
         model.add(keras.layers.Dropout(0.4))
         model.add(keras.layers.Dense(10, activation='softmax'))
         # model.summary()
-        keras.utils.plot_model(model)
-        keras.utils.plot_model(model, show_shapes=True,
-                               to_file='cnn-architecture.png', dpi=300)
+        # keras.utils.plot_model(model)
+        # keras.utils.plot_model(model, show_shapes=True,
+        #                        to_file='cnn-architecture.png', dpi=300)
         model.compile(optimizer='adam',
                       loss='sparse_categorical_crossentropy',
                       metrics='accuracy')
@@ -58,16 +61,51 @@ class ConvolutionalNeuralNetwork():
 
         classes = ['티셔츠', '바지', '스웨터', '드레스', '코트',
                    '샌달', '셔츠', '스니커즈', '가방', '앵클 부츠']
-        import numpy as np
+        # import numpy as np
         # print(classes[np.argmax(preds)])
         test_scaled = test_input.reshape(-1, 28, 28, 1)/255.0
         model.evaluate(test_scaled, test_target)
 
-        def side() -> None:
-            from PIL import Image
-            import numpy as np
-            import os
-            import matplotlib.pyplot as plt
-            imgs = np.array([np.array(Image.open(f'static/{img}'))/255.0 for img in os.listdir(
-                'static') if img.endswith('.jpg')])
-            plt.show()
+    def convolutional_neural_network_virtualization() -> None:
+        from tensorflow import keras
+        BEST_CNN_MODEL_H5 = 'best-cnn-model.h5'
+        model = keras.models.load_model(BEST_CNN_MODEL_H5)
+        # print(model.layers)
+        conv = model.layers[0]
+        # print(conv.weights[0].shape, conv.weights[1].shape)
+        conv_weights = conv.weights[0].numpy()
+        # print(conv_weights.mean(), conv_weights.std())
+
+        import matplotlib.pyplot as plt
+        # plt.hist(conv_weights.reshape(-1, 1))
+        # plt.xlabel('weight')
+        # plt.ylabel('count')
+        # plt.show()
+
+        # fig, axs = plt.subplots(2, 16, figsize=(15, 2))
+        # for i in range(2):
+        #     for j in range(16):
+        #         axs[i, j].imshow(conv_weights[:, :, 0, i*16+j],
+        #                             vmin=-0.5, vmax=0.5)
+        #         axs[i, j].axis('off')
+        # plt.show()
+
+        no_training_model = keras.Sequential()
+        no_training_model.add(keras.layers.Conv2D(
+            32, kernel_size=3, activation='relu', padding='same', input_shape=(28, 28, 1)))
+        no_training_conv = no_training_model.layers[0]
+        # print(no_training_conv.weights[0].shape)
+        no_training_weights = no_training_conv.weights[0].numpy()
+        # print(no_training_weights.mean(), no_training_weights.std())
+        plt.hist(no_training_weights.reshape(-1, 1))
+        plt.xlabel('weight')
+        plt.ylabel('count')
+        # plt.show()
+
+        # fig, axs = plt.subplots(2, 16, figsize=(15, 2))
+        # for i in range(2):
+        #     for j in range(16):
+        #         axs[i, j].imshow(no_training_weights[:, :, 0,
+        #                          i*16+j], vmin=-0.5, vmax=0.5)
+        #         axs[i, j].axis('off')
+        # plt.show()
