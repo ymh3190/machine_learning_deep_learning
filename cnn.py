@@ -97,9 +97,9 @@ class ConvolutionalNeuralNetwork():
         # print(no_training_conv.weights[0].shape)
         no_training_weights = no_training_conv.weights[0].numpy()
         # print(no_training_weights.mean(), no_training_weights.std())
-        plt.hist(no_training_weights.reshape(-1, 1))
-        plt.xlabel('weight')
-        plt.ylabel('count')
+        # plt.hist(no_training_weights.reshape(-1, 1))
+        # plt.xlabel('weight')
+        # plt.ylabel('count')
         # plt.show()
 
         # fig, axs = plt.subplots(2, 16, figsize=(15, 2))
@@ -109,3 +109,25 @@ class ConvolutionalNeuralNetwork():
         #                          i*16+j], vmin=-0.5, vmax=0.5)
         #         axs[i, j].axis('off')
         # plt.show()
+
+        """함수형 API """
+        inputs = keras.Input(shape=(784,))
+        dense1 = keras.layers.Dense(100, activation='sigmoid')
+        dense2 = keras.layers.Dense(10, activation='softmax')
+        hidden = dense1(inputs)
+        outputs = dense2(hidden)
+        model = keras.Model(inputs, outputs)
+        conv_acti = keras.Model(model.input, model.layers[0].output)
+        (train_input, train_target), (test_input,
+                                      test_target) = keras.datasets.fashion_mnist.load_data()
+        # plt.imshow(train_input[0], cmap='gray_r')
+        # plt.show()
+        inputs = train_input.reshape(-1, 28, 28, 1)/255.0
+        feature_maps = conv_acti.predict(inputs)
+        # print(feature_maps.shape)
+        fig, axs = plt.subplots(4, 8, figsize=(15, 8))
+        for i in range(4):
+            for j in range(8):
+                axs[i, j].imshow(feature_maps[0, :, :, i*8+j])
+                axs[i, j].axis('off')
+        plt.show()

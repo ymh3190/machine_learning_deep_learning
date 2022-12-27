@@ -33,9 +33,14 @@ def artificial_neural_network() -> None:
 
 def convolutional_neural_network() -> None:
     from cnn import ConvolutionalNeuralNetwork as cnn
-    # cnn.convolutional_neural_network()
-    # cnn.convolutional_neural_network_classification()
+    cnn.convolutional_neural_network()
+    cnn.convolutional_neural_network_classification()
     cnn.convolutional_neural_network_virtualization()
+
+
+def recurrent_neural_network() -> None:
+    from rnn import RecurrentNeuralNetwork as rnn
+    rnn.recurrent_neural_network()
 
 
 def algorithm() -> None:
@@ -43,4 +48,5 @@ def algorithm() -> None:
     # regress()
     # cluster()
     # artificial_neural_network()
-    convolutional_neural_network()
+    # convolutional_neural_network()
+    recurrent_neural_network()
