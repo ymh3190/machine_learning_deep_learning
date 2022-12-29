@@ -40,14 +40,14 @@ def convolutional_neural_network() -> None:
 
 def recurrent_neural_network() -> None:
     from rnn import RecurrentNeuralNetwork as rnn
-    # rnn.recurrent_neural_network()
+    rnn.recurrent_neural_network()
     rnn.lstm()
 
 
 def algorithm() -> None:
-    # classify()
-    # regress()
-    # cluster()
-    # artificial_neural_network()
-    # convolutional_neural_network()
+    classify()
+    regress()
+    cluster()
+    artificial_neural_network()
+    convolutional_neural_network()
     recurrent_neural_network()
