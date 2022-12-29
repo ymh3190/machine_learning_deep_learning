@@ -40,7 +40,8 @@ def convolutional_neural_network() -> None:
 
 def recurrent_neural_network() -> None:
     from rnn import RecurrentNeuralNetwork as rnn
-    rnn.recurrent_neural_network()
+    # rnn.recurrent_neural_network()
+    rnn.lstm()
 
 
 def algorithm() -> None:
